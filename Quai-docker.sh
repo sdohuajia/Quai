@@ -123,7 +123,7 @@ function deploy_node() {
     cd go-quai
 
     # 切换到指定版本
-    git checkout vX.XX.X
+    git checkout v0.38.0
 
     # 构建项目
     make go-quai
