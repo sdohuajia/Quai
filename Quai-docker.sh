@@ -55,18 +55,17 @@ function main_menu() {
     done
 }
 
-# 检查并安装 Docker
-function check_docker() {
-    if ! command -v docker &> /dev/null; then
-        echo "Docker 未安装，正在安装 Docker..."
-        sudo apt update
-        sudo apt install -y docker.io
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        echo "Docker 安装完成！"
+# 检查 Go 是否安装
+function check_go() {
+    if ! command -v go &> /dev/null || ! go version | grep -q "go1.23"; then
+        echo "Go 1.23 未安装，正在下载并安装最新版本..."
+        wget -c https://golang.org/dl/go1.23.2.linux-amd64.tar.gz -O - | sudo tar -xz -C /usr/local
+        echo "export PATH=\$PATH:/usr/local/go/bin" | sudo tee -a /etc/profile
+        source /etc/profile
+        echo "Go 安装完成！"
     else
-        echo "Docker 已安装，版本如下："
-        docker --version
+        echo "Go 已安装，版本如下："
+        go version
     fi
 }
 
@@ -86,10 +85,7 @@ function deploy_node() {
     # 安装必要的依赖
     echo "正在安装必要的依赖..."
     sudo apt update
-    sudo apt install -y git make g++ 
-
-    # 检查 Docker
-    check_docker
+    sudo apt install -y git make g++ screen 
 
     # 创建目录并切换到该目录
     mkdir -p /data/ && cd /data/
@@ -132,14 +128,15 @@ function deploy_node() {
     read -p '请输入 Quai 地址: ' quai_address
     read -p '请输入 Qi 地址: ' qi_address
 
-    # 启动 Docker 容器
-    docker run -d --name quai-node \
-        -e QUAI_ADDRESS="$quai_address" \
-        -e QI_ADDRESS="$qi_address" \
-        -v /data/go-quai:/data/go-quai \
-        -w /data/go-quai \
-        golang:latest \
-        ./build/bin/go-quai start --node.slices '[0 0]' --node.coinbases "$quai_address,$qi_address"
+    # 启动或附加到名为 "node" 的 screen 会话
+    screen -dmS node bash -c "./build/bin/go-quai start --node.slices '[0 0]' \
+    --node.genesis-nonce 6224362036655375007 \
+    --node.quai-coinbases '$quai_address' \
+    --node.qi-coinbases '$qi_address' \
+    --node.miner-preference '0.5'; exec bash"
+
+    echo "Quai节点已在 screen 会话 'node' 中启动。"
+    echo "你可以使用 'screen -r node' 来查看日志。"
 }
 
 # 查看日志函数
