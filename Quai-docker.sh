@@ -153,7 +153,7 @@ function deploy_stratum_proxy() {
     cd go-quai-stratum
 
     # 切换到指定版本
-    git checkout v0.XX.X
+    git checkout v0.16.0
 
     # 复制配置文件
     cp config/config.example.json config/config.json
