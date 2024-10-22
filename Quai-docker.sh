@@ -164,14 +164,11 @@ function deploy_stratum_proxy() {
     # 构建 Stratum Proxy
     make go-quai-stratum
 
-    # 运行 Stratum Proxy
-    docker run -d --name quai-stratum \
-        -v /data/go-quai-stratum:/data/go-quai-stratum \
-        -w /data/go-quai-stratum \
-        golang:latest \
-        ./build/bin/go-quai-stratum --region=cyprus --zone=cyprus1 --stratum=6666
+    # 在 screen 中运行 Stratum Proxy
+    screen -dmS stratum bash -c "./build/bin/go-quai-stratum --region=cyprus --zone=cyprus1 --stratum=3333; exec bash"
 
-    echo "Stratum Proxy 部署完成！"
+    echo "Stratum Proxy 已在 screen 会话 'stratum' 中启动。"
+    echo "你可以使用 'screen -r stratum' 来查看日志。"
 }
 
 # 启动矿工函数
@@ -202,13 +199,14 @@ function start_miner() {
     wget -P /usr/local/bin/ https://github.com/dominant-strategies/quai-gpu-miner/releases/download/v0.2.0/quai-gpu-miner
     chmod +x /usr/local/bin/quai-gpu-miner
 
-    # 使用 Docker 运行矿工
+    # 使用 screen 运行矿工
     echo "正在启动矿工..."
-    docker run -d --name quai-gpu-miner \
-        -v /var/log:/var/log \
-        quai-gpu-miner -U -P stratum://$node_ip:3333 2>&1 | tee /var/log/miner.log
 
-    echo "矿工已成功启动！"
+    # 使用 screen 后台运行矿工程序，并将日志重定向到 /var/log/miner.log
+    screen -dmS miner bash -c "quai-gpu-miner -U -P stratum://$node_ip:3333 2>&1 | tee /var/log/miner.log"
+
+    echo "矿工已成功在 screen 会话 'miner' 中启动！"
+    echo "你可以使用 'screen -r miner' 来查看日志。"
 }
 
 # 查看挖矿日志函数
