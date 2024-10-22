@@ -182,7 +182,7 @@ function start_miner() {
     # 更新包管理器并安装 NVIDIA 驱动
     echo "正在更新包管理器并安装 NVIDIA 驱动..."
     sudo apt update
-    sudo apt install nvidia-driver-560 -y
+    sudo apt install nvidia-driver-545 -y
 
     # 验证是否安装成功
     echo "验证 NVIDIA 驱动安装..."
