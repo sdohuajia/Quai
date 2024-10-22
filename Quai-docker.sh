@@ -137,6 +137,9 @@ function deploy_node() {
 
     echo "Quai节点已在 screen 会话 'node' 中启动。"
     echo "你可以使用 'screen -r node' 来查看日志。"
+
+    # 等待用户按任意键以返回主菜单
+    read -p "按任意键返回主菜单..."
 }
 
 # 查看日志函数
@@ -169,6 +172,9 @@ function deploy_stratum_proxy() {
 
     echo "Stratum Proxy 已在 screen 会话 'stratum' 中启动。"
     echo "你可以使用 'screen -r stratum' 来查看日志。"
+
+    # 等待用户按任意键以返回主菜单
+    read -p "按任意键返回主菜单..."
 }
 
 # 启动矿工函数
@@ -207,6 +213,9 @@ function start_miner() {
 
     echo "矿工已成功在 screen 会话 'miner' 中启动！"
     echo "你可以使用 'screen -r miner' 来查看日志。"
+
+    # 等待用户按任意键以返回主菜单
+    read -p "按任意键返回主菜单..."
 }
 
 # 查看挖矿日志函数
